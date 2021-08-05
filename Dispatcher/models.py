@@ -27,9 +27,6 @@ class Node(models.Model):
     name = models.CharField('Название узла', max_length=150)
     host = models.GenericIPAddressField('IP-адрес', protocol='IPv4', unique=True)
     image = models.ImageField('Фото', upload_to='nodes_photo', null=True, blank=True)
-    is_monitoring = models.BooleanField('Мониторинг', default=False)
-    key = models.CharField('Ключ сессии', max_length=10, default='', null=True, blank=True)
-    time_delta = models.FloatField('Разница времени', null=True, blank=True)
     building = models.ForeignKey(Building, verbose_name='Здание', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
@@ -74,3 +71,4 @@ class Measurement(models.Model):
 
     class Meta:
         get_latest_by = 'time'
+        unique_together = ('unit', 'time')

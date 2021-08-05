@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from Dispatcher.models import Node, Building, Unit, Measurement
 
-TZ = timezone.get_default_timezone()
+TZ = timezone.get_current_timezone()
 
 
 def main_page(request):
@@ -26,16 +26,17 @@ def node_page(request, node_id):
 
 
 def unit_page(request, unit_id, start_datetime=None, end_datetime=None):
-    start_datetime = start_datetime or datetime.datetime.combine(datetime.date.today(), datetime.time(7, 30), TZ)
-    end_datetime = end_datetime or datetime.datetime.combine(datetime.date.today(), datetime.time(17, 30), TZ)
+    start_datetime = start_datetime or datetime.datetime.combine(datetime.date.today(), datetime.time(7, 30))
+    end_datetime = end_datetime or datetime.datetime.combine(datetime.date.today(), datetime.time(17, 30))
+
+    start_datetime = TZ.localize(start_datetime)
+    end_datetime = TZ.localize(end_datetime)
 
     unit = Unit.objects.get(id=unit_id)
 
+    measurements = Measurement.objects.filter(unit_id=unit_id, time__gte=start_datetime, time__lte=end_datetime)
     labels = []
     data = []
-
-    measurements = Measurement.objects.filter(unit_id=unit_id, time__gte=start_datetime, time__lte=end_datetime)[:10]
-
     for measurement in measurements:
         labels.append(measurement.time.astimezone(TZ).strftime('%H:%M:%S'))
         data.append(measurement.value)

@@ -30,7 +30,7 @@ class BuildingAdmin(admin.ModelAdmin):
 class NodeAdmin(admin.ModelAdmin):
     list_display = ('id', 'building', 'name')
     list_display_links = ('name',)
-    list_filter = ('building', 'is_monitoring')
+    list_filter = ('building',)
     inlines = (UnitInlines,)
 
     class Meta:
