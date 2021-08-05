@@ -85,6 +85,17 @@ DATABASES = {
     }
 }
 
+REDIS_HOST = 'localhost'
+
+REDIS_PORT = '6379'
+
+# Celery Configuration Options
+CELERY_TASK_TRACK_STARTED = True
+
+# CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 

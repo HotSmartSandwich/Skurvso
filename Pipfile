@@ -8,6 +8,11 @@ django = "*"
 celery = "*"
 psycopg2 = "*"
 pillow = "*"
+gevent = "*"
+redis = "*"
+aiohttp = "*"
+ntplib = "*"
+requests = "*"
 
 [dev-packages]
 
