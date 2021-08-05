@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ building.name }}
+{% endblock title %}
+
+{% block content %}
+    <a href="/"> Назад </a>
+
+    {% for node in nodes %}
+        <p>
+            <a href="{{ node.get_absolute_url }}"> {{ node.name }} </a>
+        </p>
+
+        {% if node.image %}
+            <img src="{{ node.image.url }}" alt="{{ node.name }}">
+        {% endif %}
+    {% endfor %}
+{% endblock content %}
+
+

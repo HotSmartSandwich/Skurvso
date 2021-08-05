@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    ПАО "Асколльд"
+{% endblock title %}
+
+
+{% block content %}
+    {% for building in buildings %}
+        <h4>
+            <a href="{{ building.get_absolute_url }}"> {{ building.name }} </a>
+        </h4>
+    {% endfor %}
+{% endblock content %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ node.name }}
+{% endblock title %}
+
+{% block content %}
+    <a href="{{ node.building.get_absolute_url }}"> Назад </a>
+
+    {% for unit in units %}
+        <p>
+            <a href="{{ unit.get_absolute_url }}"> {{ unit.name }} </a>
+        </p>
+
+        {% if unit.image %}
+            <img src="{{ unit.image.url }}" alt="{{ unit.name }}">
+        {% endif %}
+    {% endfor %}
+{% endblock content %}
