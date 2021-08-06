@@ -5,14 +5,14 @@ name = "pypi"
 
 [packages]
 django = "*"
-celery = "*"
+djangorestframework = "*"
 psycopg2 = "*"
 pillow = "*"
-gevent = "*"
+celery = "*"
 redis = "*"
-aiohttp = "*"
-ntplib = "*"
+gevent = "*"
 requests = "*"
+ntplib = "*"
 
 [dev-packages]
 

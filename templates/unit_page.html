@@ -1,51 +1,37 @@
 {% extends 'base.html' %}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
-
-
 {% block title %}
     {{ unit.name }}
 {% endblock title %}
 
 {% block content %}
-    <a href="{{ unit.node.get_absolute_url }}"> Назад </a>
+    <h3>{{ unit.name }}</h3>
+    <a href="{{ unit.node.get_absolute_url }}">Назад</a>
+    <br/>
 
-    {{ measurements.count }}
+    <div style="width: fit-content; margin: auto">
+        <label>
+            <input type="date" class="form-control" id="start_date" value="{{ start_date }}">
+            <input type="time" class="form-control" id="start_time" value="{{ start_time }}">
+            <input type="time" class="form-control" id="end_time" value="{{ end_time }}">
+            <input type="number" class="form-control" id="points_number" value="{{ points_number }}">
+            <button type="submit" class="form-control btn btn-success" id="update_plot_button">Обновить данные</button>
+        </label>
+    </div>
+    <br/>
 
-    {% if unit.image %}
-        <img src="{{ unit.image.url }}" alt="{{ unit.name }}">
-    {% endif %}
-
-
-    <div id="container" style="width: 75%;">
+    <div id="container" style="width: 80%; margin: auto">
         <canvas id="chart"></canvas>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.0/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
     <script>
-        const config = {
-            type: 'line',
-            data: {
-                datasets: [{
-                    data: {{ data|safe }},
-                    backgroundColor: ['#696969', '#808080', '#A9A9A9', '#C0C0C0', '#D3D3D3'],
-                    label: 'Потребление тока'
-                }],
-                labels: {{ labels|safe }}
-            },
-            options: {
-                responsive: true
-            }
-        };
-
-        window.onload = function () {
-            const ctx = document.getElementById('chart').getContext('2d');
-            window.myPie = new Chart(ctx, config);
-        };
+        const api_url = '/api/mes/';
+        const unit_id = {{ unit.id }};
     </script>
-
-
-
+    <script src="/static/line_plot_handler.js"></script>
 
 {% endblock content %}
