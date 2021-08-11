@@ -1,21 +1,20 @@
 {% extends 'base.html' %}
 
+
 {% block title %}
     {{ building.name }}
 {% endblock title %}
 
+
 {% block content %}
-
-    <a href="/">Вернуться к общему окну</a>
-
     {% for node in nodes %}
         <div class="card" style="width: 18rem;">
             <div class="card-body">
                 <h2 class="card-title">{{ node.name }}</h2>
+                <h6 class="card-subtitle mb-2 text-muted">ID: {{ node.id }}</h6>
                 <h6 class="card-subtitle mb-2 text-muted">IP-адрес: {{ node.host }}</h6>
-                <a href="{{ node.get_absolute_url }}" class="btn btn-primary">Открыть узел</a>
+                <a href="{{ node.get_absolute_url }}" class="btn btn-primary">Обзор участка</a>
             </div>
         </div>
     {% endfor %}
-
 {% endblock content %}

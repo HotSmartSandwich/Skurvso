@@ -1,27 +1,46 @@
 {% extends 'base.html' %}
 
+
 {% block title %}
     {{ unit.name }}
 {% endblock title %}
 
+
 {% block content %}
-    <h3>{{ unit.name }}</h3>
-    <a href="{{ unit.node.get_absolute_url }}">Назад</a>
-    <br/>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-10">
+                <canvas id="chart"></canvas>
+            </div>
 
-    <div style="width: fit-content; margin: auto">
-        <label>
-            <input type="date" class="form-control" id="start_date" value="{{ start_date }}">
-            <input type="time" class="form-control" id="start_time" value="{{ start_time }}">
-            <input type="time" class="form-control" id="end_time" value="{{ end_time }}">
-            <input type="number" class="form-control" id="points_number" value="{{ points_number }}">
-            <button type="submit" class="form-control btn btn-success" id="update_plot_button">Обновить данные</button>
-        </label>
-    </div>
-    <br/>
+            <div class="col-md-2">
+                <div class="form-floating">
+                    <input type="date" class="form-control" id="start_date" value="{{ start_date }}">
+                    <label for="start_date" class="form-label">Дата</label>
+                </div>
 
-    <div id="container" style="width: 80%; margin: auto">
-        <canvas id="chart"></canvas>
+                <div class="form-floating">
+                    <input type="time" class="form-control" id="start_time" value="{{ start_time }}">
+                    <label for="start_time">Время начала</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="time" class="form-control" id="end_time" value="{{ end_time }}">
+                    <label for="end_time">Время конца</label>
+                </div>
+
+                <div class="form-floating">
+                    <input type="number" class="form-control" id="points_number" value="{{ points_number }}">
+                    <label for="points_number" class="form-label">Количество точек</label>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-success" id="update_plot">Обновить</button>
+                    <input type="checkbox" class="btn-check" id="auto_update">
+                    <label class="btn btn-outline-primary" for="auto_update">Авто</label>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
@@ -29,7 +48,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
     <script>
-        const api_url = '/api/mes/';
+        const api_url = '/api/measurement/';
         const unit_id = {{ unit.id }};
     </script>
     <script src="/static/line_plot_handler.js"></script>

@@ -2,14 +2,18 @@
 
 
 {% block title %}
-    ПАО "Асколльд"
+    Главная страница
 {% endblock title %}
 
 
 {% block content %}
-    {% for building in buildings %}
-        <h4>
-            <a href="{{ building.get_absolute_url }}"> {{ building.name }} </a>
-        </h4>
+{% for building in buildings %}
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h2 class="card-title">{{ building.name }}</h2>
+                <h6 class="card-subtitle mb-2 text-muted">ID: {{ building.id }}</h6>
+                <a href="{{ building.get_absolute_url }}" class="btn btn-primary">Обзор цеха</a>
+            </div>
+        </div>
     {% endfor %}
 {% endblock content %}

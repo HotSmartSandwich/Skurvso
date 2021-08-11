@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import ntplib
 import requests
@@ -76,13 +76,19 @@ class NodeCommunicator:
 
         start_id = records[0].get('id')
         end_id = records[-1].get('id')
+
         for record in records:
             record.pop('id')
             record['time'] = datetime.fromtimestamp(record.pop('timestamp'), tz=TZ)
-            db_record = db_model(**record)
+            new_db_record = db_model(**record)
+
+            latest_db_record = db_model.objects.filter(unit=new_db_record.unit).latest()
+            if new_db_record.time - latest_db_record.time >= timedelta(seconds=5):
+                Measurement(unit=new_db_record.unit, time=latest_db_record.time + timedelta(seconds=1)).save()
+                print('empty val:', latest_db_record.time)
+
             try:
-                db_record.save()
-                print(record.get('time'), record.get('value'))
+                new_db_record.save()
             except IntegrityError as e:
                 print(e)
 

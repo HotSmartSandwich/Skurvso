@@ -1,19 +1,20 @@
 {% extends 'base.html' %}
 
+
 {% block title %}
     {{ node.name }}
 {% endblock title %}
 
+
 {% block content %}
-    <a href="{{ node.building.get_absolute_url }}"> Назад </a>
-
     {% for unit in units %}
-        <p>
-            <a href="{{ unit.get_absolute_url }}"> {{ unit.name }} </a>
-        </p>
-
-        {% if unit.image %}
-            <img src="{{ unit.image.url }}" alt="{{ unit.name }}">
-        {% endif %}
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h2 class="card-title">{{ unit.name }}</h2>
+                <h6 class="card-subtitle mb-2 text-muted">ID: {{ unit.id }}</h6>
+                <h6 class="card-subtitle mb-2 text-muted">IP-адрес: {{ unit.host }}</h6>
+                <a href="{{ unit.get_absolute_url }}" class="btn btn-primary">Обзор оборудования</a>
+            </div>
+        </div>
     {% endfor %}
 {% endblock content %}

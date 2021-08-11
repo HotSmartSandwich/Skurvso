@@ -1,13 +1,24 @@
 const config = {
     type: 'line',
     data: {
-        labels: [],
         datasets: [
             {
                 data: [],
                 stepped: 'middle',
                 fill: true,
                 borderColor: 'rgb(0,0,255)',
+            },
+            {
+                data: [],
+                stepped: 'middle',
+                fill: true,
+                borderColor: 'rgb(255,128,0)',
+            },
+            {
+                data: [],
+                stepped: 'middle',
+                fill: true,
+                borderColor: 'rgb(255,0,0)',
             }
         ]
     },
@@ -65,38 +76,49 @@ const config = {
     }
 }
 
-const ctx = document.getElementById('chart').getContext('2d')
-const myChart = new Chart(ctx, config)
-
-$('#update_plot_button').click(function (e) {
-    updatePlotData()
-})
+let ctx = document.getElementById('chart').getContext('2d')
+let myChart = new Chart(ctx, config)
 
 $(document).ready(function () {
     updatePlotData()
 })
 
+$('#update_plot').click(function (e) {
+    updatePlotData()
+})
+
+let timerId
+$('#auto_update').click(function (e) {
+    if (e.target.checked) {
+        timerId = setTimeout(function run() {
+            updatePlotData()
+            timerId = setTimeout(run, 1000)
+        }, 1000)
+    } else {
+        clearTimeout(timerId)
+    }
+})
+
 function updatePlotData() {
+    const start_time = document.getElementById('start_time').value
+    const end_time = document.getElementById('end_time').value
+    const start_date = document.getElementById('start_date').value
+    const points_number = document.getElementById('points_number').value
+
     $.ajax({
         url: api_url,
         method: 'get',
         dataType: 'json',
         data: {
             unit_id: unit_id,
-            start_date: document.getElementById('start_date').value,
-            start_time: document.getElementById('start_time').value,
-            end_time: document.getElementById('end_time').value,
-            points_number: document.getElementById('points_number').value
+            start_date: start_date,
+            start_time: start_time,
+            end_time: end_time,
+            points_number: points_number
         },
         success: function (response) {
-            const values = []
-            const times = []
-            for (let i = 0; i < response.length; i++) {
-                values[i] = response[i].value
-                times[i] = response[i].time
-            }
-            config.data.labels = times
-            config.data.datasets[0].data = values
+            console.log(response)
+            config.data.datasets[0].data = response
             myChart.update()
         },
         error: function (response) {

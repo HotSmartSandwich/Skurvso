@@ -3,7 +3,7 @@ from django.urls import path, include
 from .views import main_page, building_page, node_page, unit_page, MeasurementsList
 
 api_patterns = [
-    path('mes/', MeasurementsList.as_view()),
+    path('measurement/', MeasurementsList.as_view()),
 ]
 
 urlpatterns = [

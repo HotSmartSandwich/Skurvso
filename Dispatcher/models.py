@@ -66,7 +66,7 @@ class Measurement(models.Model):
 
     id = models.BigAutoField(primary_key=True)
     time = models.DateTimeField()
-    value = models.FloatField()
+    value = models.FloatField(null=True)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
 
     class Meta:
