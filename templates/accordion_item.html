@@ -1,0 +1,25 @@
+<div class="accordion-item">
+    <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#accordion-{{ name }}">
+            {% if element %}
+                {{ element.name }}
+            {% else %}
+                {{ name }}
+            {% endif %}
+        </button>
+    </h2>
+    <div id="accordion-{{ name }}" class="accordion-collapse collapse">
+        <div class="accordion-body">
+            {% for e in elements %}
+                {% if e == element %}
+                    <strong>
+                        <a class="nav-item nav-link" href="{{ e.get_absolute_url }}">{{ e.name }}</a>
+                    </strong>
+                {% else %}
+                    <a class="nav-item nav-link" href="{{ e.get_absolute_url }}">{{ e.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
