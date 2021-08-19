@@ -15,6 +15,8 @@ def main():
     while True:
         time.sleep(time_interval - time.time() % time_interval + 0.2)
         value += (2 * amplitude) * random() - 100
+        if value < 0:
+            value = 0
         Measurement(unit_id=8, time=datetime.now(tz), value=value).save()
 
 

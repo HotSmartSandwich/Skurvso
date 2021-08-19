@@ -15,29 +15,29 @@
 
             <div class="col-md-2">
                 <div class="form-floating">
-                    <input type="date" class="form-control" id="start_date" value="{{ start_date }}">
-                    <label for="start_date" class="form-label">Дата</label>
+                    <input type="date" class="form-control" id="startDate" value="{{ startDate }}">
+                    <label for="startDate" class="form-label">Дата</label>
                 </div>
 
                 <div class="form-floating">
-                    <input type="time" class="form-control" id="start_time" value="{{ start_time }}">
-                    <label for="start_time">Время начала</label>
+                    <input type="time" class="form-control" id="startTime" value="{{ startTime }}">
+                    <label for="startTime">Время начала</label>
                 </div>
 
                 <div class="form-floating">
-                    <input type="time" class="form-control" id="end_time" value="{{ end_time }}">
-                    <label for="end_time">Время конца</label>
+                    <input type="time" class="form-control" id="endTime" value="{{ endTime }}">
+                    <label for="endTime">Время конца</label>
                 </div>
 
                 <div class="form-floating">
-                    <input type="number" class="form-control" id="points_number" value="{{ points_number }}">
-                    <label for="points_number" class="form-label">Количество точек</label>
+                    <input type="number" class="form-control" id="pointsNumber" value="{{ pointsNumber }}">
+                    <label for="pointsNumber" class="form-label">Количество точек</label>
                 </div>
 
                 <div class="btn-group">
-                    <button class="btn btn-success" id="update_plot">Обновить</button>
-                    <input type="checkbox" class="btn-check" id="auto_update">
-                    <label class="btn btn-outline-primary" for="auto_update">Авто</label>
+                    <button class="btn btn-success" id="updateButton">Обновить</button>
+                    <input type="checkbox" class="btn-check" id="autoUpdateButton">
+                    <label class="btn btn-outline-primary" for="autoUpdateButton">Авто</label>
                 </div>
             </div>
         </div>
@@ -48,9 +48,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
     <script>
-        const api_url = '/api/measurement/';
-        const unit_id = {{ unit.id }};
+      const apiUrl = '/api/measurement/'
+      const unitId = {{ unit.id }};
     </script>
     <script src="/static/line_plot_handler.js"></script>
-
 {% endblock content %}

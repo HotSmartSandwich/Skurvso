@@ -9,19 +9,16 @@ from rest_framework.response import Response
 from Dispatcher.models import Node, Building, Unit, Measurement
 
 TZ = timezone.get_current_timezone()
-START_TIME = time(7, 30)
-END_TIME = time(17, 30)
-POINTS_NUMBER = 250
 
 
 def get_context(building_id=None, node_id=None, unit_id=None):
     context = dict()
     if unit_id is not None:
         context = {
-            'start_date': date.today().isoformat(),
-            'start_time': START_TIME.isoformat(),
-            'end_time': END_TIME.isoformat(),
-            'points_number': POINTS_NUMBER
+            'startDate': date.today().isoformat(),
+            'startTime': time(7, 30).isoformat(),
+            'endTime': time(17, 30).isoformat(),
+            'pointsNumber': 250
         }
 
         unit = Unit.objects.get(id=unit_id)
@@ -64,39 +61,35 @@ class MeasurementsList(views.APIView):
     def get(self, request: Request):
         request_params = request.query_params
 
-        unit_id = request_params.get('unit_id')
-        start_date = request_params.get('start_date')
-        start_time = request_params.get('start_time')
-        end_time = request_params.get('end_time')
-        points_number = int(request_params.get('points_number', POINTS_NUMBER))
-
-        start_date = date.fromisoformat(start_date) if start_date else date.today()
-        start_time = time.fromisoformat(start_time) if start_time else START_TIME
-        end_time = time.fromisoformat(end_time) if end_time else END_TIME
+        unit_id = request_params.get('unitId')
+        start_date = date.fromisoformat(request_params.get('startDate'))
+        start_time = time.fromisoformat(request_params.get('startTime'))
+        end_time = time.fromisoformat(request_params.get('endTime'))
+        points_number = int(request_params.get('pointsNumber'))
 
         start_datetime = TZ.localize(datetime.combine(start_date, start_time))
         end_datetime = TZ.localize(datetime.combine(start_date, end_time))
 
         query_filter = dict(unit_id=unit_id, time__gte=start_datetime, time__lte=end_datetime)
-
-        all_measurements = Measurement.objects.filter(**query_filter, value__isnull=False).order_by('time')
+        query = Measurement.objects.filter(**query_filter, value__isnull=False).order_by('time')
 
         try:
-            step = round(all_measurements.count() / points_number) or 1
+            step = round(query.count() / points_number) or 1
         except ZeroDivisionError:
-            return
-
-        measurement_ids = [measurement.id for measurement in all_measurements][::step]
+            return Response()
         try:
-            last_measurement = all_measurements.latest()
+            latest_measurement = query.latest()
         except Measurement.DoesNotExist:
-            return
-        measurement_ids.append(last_measurement.id)
+            return Response()
 
-        breaks = Measurement.objects.filter(**query_filter, value__isnull=True)
-        measurement_ids += [measurement.id for measurement in breaks]
+        query_sliced: list[Measurement] = query[::step]
+        query_sliced.append(latest_measurement)
 
-        response = Measurement.objects.filter(id__in=measurement_ids).order_by('time')
-        response = map(lambda m: dict(x=m.time, y=m.value), response)
+        break_points: list[Measurement] = list(Measurement.objects.filter(**query_filter, value__isnull=True))
+        response = sorted(query_sliced + break_points, key=lambda meas: meas.time)
 
-        return Response(response)
+        return Response(map(serialize, response))
+
+
+def serialize(measurement: Measurement):
+    return dict(x=measurement.time, y=measurement.value)
