@@ -16,70 +16,76 @@
 </head>
 
 <body>
-<nav style="--bs-breadcrumb-divider: ' ';" aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-            <a type="button" class="btn btn btn-secondary" href="/">Главная</a>
-        </li>
+<div class="container-fluid">
+    <div class="row">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
 
-        {% if building %}
-            <li class="breadcrumb-item btn-group btn-group">
-                <a type="button" class="btn btn-secondary"
-                   href="{{ building.get_absolute_url }}">{{ building.name }}</a>
-                <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split"
-                        data-bs-toggle="dropdown" aria-expanded="false"></button>
-                {% include 'dropdown_menu.html' with elements=buildings %}
-            </li>
+            <div class="position-sticky pt-3">
+                <a class="nav-link" href="/"><h4>Главная</h4></a>
 
-            {% if node %}
-                <li class="breadcrumb-item btn-group btn-group">
-                    <a type="button" class="btn btn-secondary"
-                       href="{{ node.get_absolute_url }}">{{ node.name }}</a>
-                    <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split"
-                            data-bs-toggle="dropdown" aria-expanded="false"></button>
-                    {% include 'dropdown_menu.html' with elements=nodes %}
-                </li>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#accordion-buildings">
+                                {% if building %}
+                                    {{ building.name }}
+                                {% else %}
+                                    Выбор цеха
+                                {% endif %}
+                            </button>
+                        </h2>
+                        <div id="accordion-buildings" class="accordion-collapse collapse">
+                            {% include 'accordion_body.html' with elements=buildings %}
+                        </div>
+                    </div>
 
-                {% if unit %}
-                    <li class="breadcrumb-item btn-group btn-group">
-                        <a type="button" class="btn btn-secondary"
-                           href="{{ unit.get_absolute_url }}">{{ unit.name }}</a>
-                        <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split"
-                                data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        {% include 'dropdown_menu.html' with elements=units %}
-                    </li>
-                {% else %}
-                    <li class="breadcrumb-item">
-                        <button type="button" class="btn btn btn-secondary dropdown-toggle dropdown-toggle-split"
-                                data-bs-toggle="dropdown" aria-expanded="false">Выбор оборудования
-                        </button>
-                        {% include 'dropdown_menu.html' with elements=units %}
-                    </li>
-                {% endif %}
+                    {% if building %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#accordion-nodes">
+                                    {% if node %}
+                                        {{ node.name }}
+                                    {% else %}
+                                        Выбор участка
+                                    {% endif %}
+                                </button>
+                            </h2>
+                            <div id="accordion-nodes" class="accordion-collapse collapse">
+                                {% include 'accordion_body.html' with elements=nodes %}
+                            </div>
+                        </div>
+                    {% endif %}
 
-            {% else %}
-                <li class="breadcrumb-item">
-                    <button type="button" class="btn btn btn-secondary dropdown-toggle dropdown-toggle-split"
-                            data-bs-toggle="dropdown" aria-expanded="false">Выбор участка
-                    </button>
-                    {% include 'dropdown_menu.html' with elements=nodes %}
-                </li>
-            {% endif %}
+                    {% if node %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#accordion-units">
+                                    {% if unit %}
+                                        {{ unit.name }}
+                                    {% else %}
+                                        Выбор станка
+                                    {% endif %}
+                                </button>
+                            </h2>
+                            <div id="accordion-units" class="accordion-collapse collapse">
+                                {% include 'accordion_body.html' with elements=units %}
+                            </div>
+                        </div>
+                    {% endif %}
 
-        {% else %}
-            <li class="breadcrumb-item">
-                <button type="button" class="btn btn btn-secondary dropdown-toggle dropdown-toggle-split"
-                        data-bs-toggle="dropdown" aria-expanded="false">Выбор цеха
-                </button>
-                {% include 'dropdown_menu.html' with elements=buildings %}
-            </li>
-        {% endif %}
-    </ol>
-</nav>
-
-{% block content %}
-    Блок контента
-{% endblock %}
+                </div>
+            </div>
+        </nav>
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            {% block content %}
+                Блок контента
+            {% endblock %}
+        </main>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -7,37 +7,39 @@
 
 
 {% block content %}
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-10">
-                <canvas id="chart"></canvas>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ unit.name }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="form-floating">
+                <input type="date" class="form-control" id="startDate" value="{{ startDate }}">
+                <label for="startDate" class="form-label">Дата измерений</label>
             </div>
+        </div>
+    </div>
 
-            <div class="col-md-2">
-                <div class="form-floating">
-                    <input type="date" class="form-control" id="startDate" value="{{ startDate }}">
-                    <label for="startDate" class="form-label">Дата</label>
-                </div>
+    <canvas class="my-4 w-100" id="chart" width="900" height="380"></canvas>
 
+    {# Сделать выпадающее меню с параметрами отображения #}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
                 <div class="form-floating">
                     <input type="time" class="form-control" id="startTime" value="{{ startTime }}">
                     <label for="startTime">Время начала</label>
                 </div>
-
                 <div class="form-floating">
                     <input type="time" class="form-control" id="endTime" value="{{ endTime }}">
-                    <label for="endTime">Время конца</label>
+                    <label for="endTime">Время окончания</label>
                 </div>
-
+            </div>
+            <div class="col-md-3">
                 <div class="form-floating">
                     <input type="number" class="form-control" id="pointsNumber" value="{{ pointsNumber }}">
                     <label for="pointsNumber" class="form-label">Количество точек</label>
                 </div>
-
-                <div class="btn-group">
-                    <button class="btn btn-success" id="updateButton">Обновить</button>
+                <div class="btn-group" style="width: 100%">
                     <input type="checkbox" class="btn-check" id="autoUpdateButton">
-                    <label class="btn btn-outline-primary" for="autoUpdateButton">Авто</label>
+                    <label class="btn btn-outline-success" for="autoUpdateButton">Автообновление</label>
                 </div>
             </div>
         </div>

@@ -62,10 +62,13 @@ class MeasurementsList(views.APIView):
         request_params = request.query_params
 
         unit_id = request_params.get('unitId')
-        start_date = date.fromisoformat(request_params.get('startDate'))
-        start_time = time.fromisoformat(request_params.get('startTime'))
-        end_time = time.fromisoformat(request_params.get('endTime'))
-        points_number = int(request_params.get('pointsNumber'))
+        try:
+            start_date = date.fromisoformat(request_params.get('startDate'))
+            start_time = time.fromisoformat(request_params.get('startTime'))
+            end_time = time.fromisoformat(request_params.get('endTime'))
+            points_number = abs(int(request_params.get('pointsNumber')))
+        except ValueError:
+            return Response()
 
         start_datetime = TZ.localize(datetime.combine(start_date, start_time))
         end_datetime = TZ.localize(datetime.combine(start_date, end_time))

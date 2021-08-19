@@ -33,7 +33,7 @@ const config = {
     plugins: {
       title: {
         text: 'График измерений',
-        display: true,
+        display: false,
       },
       legend: {
         display: false,
@@ -42,7 +42,7 @@ const config = {
     scales: {
       x: {
         title: {
-          display: true,
+          display: false,
           text: 'Время',
           font: {
             size: 16,
@@ -60,7 +60,7 @@ const config = {
       },
       y: {
         title: {
-          display: true,
+          display: false,
           text: 'Ток, А',
           font: {
             size: 16,
@@ -86,25 +86,43 @@ const config = {
 const ctx = document.getElementById('chart').getContext('2d')
 const myChart = new Chart(ctx, config)
 
+let delayedUpdateTimerId = null
+
 $(document).ready(function () {
   updatePlot()
 })
 
-$('#updateButton').click(function (e) {
+$('#startDate').change(function (e) {
+  updatePlotWithDelay()
+})
+$('#startTime').change(function (e) {
+  updatePlotWithDelay()
+})
+$('#endTime').change(function (e) {
+  updatePlotWithDelay()
+})
+$('#pointsNumber').change(function (e) {
   updatePlot()
 })
 
-let timerId
+let autoUpdateTimerId = null
 $('#autoUpdateButton').click(function (e) {
   if (e.target.checked) {
-    timerId = setTimeout(function run () {
+    autoUpdateTimerId = setTimeout(function run () {
       updatePlot()
-      timerId = setTimeout(run, 1000)
+      autoUpdateTimerId = setTimeout(run, 1000)
     }, 1000)
   } else {
-    clearTimeout(timerId)
+    clearTimeout(autoUpdateTimerId)
   }
 })
+
+function updatePlotWithDelay () {
+  clearTimeout(delayedUpdateTimerId)
+  delayedUpdateTimerId = setTimeout(function () {
+    updatePlot()
+  }, 500)
+}
 
 function updatePlot () {
   const startDate = document.getElementById('startDate').value
@@ -125,6 +143,10 @@ function updatePlot () {
     },
     success: function (response) {
       clearDatasets()
+      if (1) {
+        config.options.scales.x.min = Date.parse(startDate + 'T' + startTime)
+        config.options.scales.x.max = Date.parse(startDate + 'T' + endTime)
+      }
 
       let lastLimitId = null
       for (let i = 0; i < response.length; i++) {

@@ -1,0 +1,5 @@
+<div class="accordion-body">
+    {% for e in elements %}
+        <a class="nav-item nav-link" href="{{ e.get_absolute_url }}">{{ e.name }}</a>
+    {% endfor %}
+</div>
