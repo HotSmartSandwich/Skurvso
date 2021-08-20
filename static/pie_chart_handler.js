@@ -17,6 +17,7 @@ const config = {
       },
       legend: {
         display: true,
+        position: 'bottom',
       },
     },
   },
@@ -33,8 +34,16 @@ $(document).ready(function () {
   }, 60000)
 })
 
-function clearDataset () {
-  dataset.data = Array(limitValues.length + 2).fill(0)
+let delayedUpdateTimerId = null
+$('#start-date').change(function (e) {
+  updatePlotWithDelay()
+})
+
+function updatePlotWithDelay () {
+  clearTimeout(delayedUpdateTimerId)
+  delayedUpdateTimerId = setTimeout(function () {
+    updatePlot()
+  }, 500)
 }
 
 function updatePlot () {
@@ -49,34 +58,72 @@ function updatePlot () {
       startDate: startDate,
     },
     success: function (response) {
-      clearDataset()
-
+      let timesList = Array(limitValues.length + 2).fill(0)
+      let lastLimitId = null
+      let lastLimitStartTime = null
       for (let i = 0; i < response.length; i++) {
-        const value = response[i].y
-        if (value == null) {
-          dataset.data[limitValues.length + 1] += 1
-          continue
-        }
+        const newData = response[i]
 
-        let valueId = null
-        for (let i = 0; i < limitValues.length; i++) {
-          if (value > limitValues[i]) {
-            valueId = i
-            break
+        let newLimitId = null
+        if (newData.y == null) {
+          newLimitId = limitValues.length + 1
+        } else {
+          for (let i = 0; i < limitValues.length; i++) {
+            if (newData.y > limitValues[i]) {
+              newLimitId = i
+              break
+            }
+          }
+          if (newLimitId == null) {
+            newLimitId = limitValues.length
           }
         }
-        if (valueId == null) {
-          valueId = limitValues.length
-        }
 
-        dataset.data[valueId] += 1
+        if (newLimitId !== lastLimitId) {
+          const lastLimitEndTime = Date.parse(newData.x)
+          if (lastLimitId) {
+            timesList[lastLimitId] += lastLimitEndTime - lastLimitStartTime
+          }
+          lastLimitId = newLimitId
+          lastLimitStartTime = lastLimitEndTime
+        }
       }
+      const startTime = Date.parse(response[0].x)
+      const endTime = Date.parse(response[response.length - 1].x)
+      timesList[lastLimitId] += endTime - lastLimitStartTime
+
+      document.getElementById('time-total').
+        textContent = getTime(endTime - startTime)
+      document.getElementById('time-work').
+        textContent = getTime(timesList[0])
+      document.getElementById('time-no_load').
+        textContent = getTime(timesList[1])
+      document.getElementById('time-stop').
+        textContent = getTime(timesList[2])
+      document.getElementById('time-unknown').
+        textContent = getTime(timesList[3])
+
+      dataset.data = timesList
       myChart.update()
     },
     error: function (response) {
       console.log('ajax error')
-      clearDataset()
+      dataset.data = []
+      document.getElementById('time-total').
+        textContent = '00:00'
+      document.getElementById('time-work').
+        textContent = '00:00'
+      document.getElementById('time-no_load').
+        textContent = '00:00'
+      document.getElementById('time-stop').
+        textContent = '00:00'
+      document.getElementById('time-unknown').
+        textContent = '00:00'
       myChart.update()
     },
   })
+}
+
+function getTime (timestamp) {
+  return new Date(timestamp).toISOString().substring(11, 16)
 }

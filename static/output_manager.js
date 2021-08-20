@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $('input[type=radio][id=output-type-pie]').click()
+  $('input[type=radio][id=output-type-line]').click()
 })
 
 $('input[type=radio][name=output-type]').change(function () {
@@ -12,6 +12,5 @@ function showOutput (outputId) {
   $('#output-line').hide()
   $('#output-table').hide()
   $('#output-pie').hide()
-
   $(outputId).show()
 }

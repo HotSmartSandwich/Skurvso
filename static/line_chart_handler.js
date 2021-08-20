@@ -75,7 +75,7 @@ $(document).ready(function () {
   updateLineChart()
 })
 
-let delayedUpdateTimerId = null
+let delayedLineChartUpdateTimerId = null
 $('#start-date').change(function (e) {
   updateLineChartWithDelay()
 })
@@ -93,7 +93,9 @@ let autoUpdateTimerId = null
 $('#auto-update-button').click(function (e) {
   if (e.target.checked) {
     autoUpdateTimerId = setTimeout(function run () {
-      updateLineChart()
+      if ($('#output-type-line').is(':checked')) {
+        updateLineChart()
+      }
       autoUpdateTimerId = setTimeout(run, 1000)
     }, 1000)
   } else {
@@ -102,8 +104,8 @@ $('#auto-update-button').click(function (e) {
 })
 
 function updateLineChartWithDelay () {
-  clearTimeout(delayedUpdateTimerId)
-  delayedUpdateTimerId = setTimeout(function () {
+  clearTimeout(delayedLineChartUpdateTimerId)
+  delayedLineChartUpdateTimerId = setTimeout(function () {
     updateLineChart()
   }, 500)
 }
