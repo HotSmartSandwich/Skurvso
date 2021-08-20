@@ -1,33 +1,18 @@
-const limitValues = [
-  2000,
-  1000,
-]
-const plotColors = [
-  'rgb(0,0,255)',
-  'rgb(255,128,0)',
-  'rgb(255,0,0)',
-]
-
-const datasets = []
+const lineChartDatasets = []
 for (let i = 0; i <= limitValues.length; i++) {
-  datasets.push({
+  lineChartDatasets.push({
     borderColor: plotColors[i],
+    label: labels[i],
     data: [],
     fill: true,
     stepped: 'middle',
   })
 }
 
-function clearDatasets () {
-  for (let i = 0; i < datasets.length; i++) {
-    datasets[i].data = []
-  }
-}
-
-const config = {
+const lineChartConfig = {
   type: 'line',
   data: {
-    datasets: datasets,
+    datasets: lineChartDatasets,
   },
   options: {
     plugins: {
@@ -36,7 +21,7 @@ const config = {
         display: false,
       },
       legend: {
-        display: false,
+        display: true,
       },
     },
     scales: {
@@ -83,33 +68,32 @@ const config = {
   },
 }
 
-const ctx = document.getElementById('chart').getContext('2d')
-const myChart = new Chart(ctx, config)
-
-let delayedUpdateTimerId = null
+const lineChartCanvas = document.getElementById('line-chart').getContext('2d')
+const lineChart = new Chart(lineChartCanvas, lineChartConfig)
 
 $(document).ready(function () {
-  updatePlot()
+  updateLineChart()
 })
 
-$('#startDate').change(function (e) {
-  updatePlotWithDelay()
+let delayedUpdateTimerId = null
+$('#start-date').change(function (e) {
+  updateLineChartWithDelay()
 })
-$('#startTime').change(function (e) {
-  updatePlotWithDelay()
+$('#start-time').change(function (e) {
+  updateLineChartWithDelay()
 })
-$('#endTime').change(function (e) {
-  updatePlotWithDelay()
+$('#end-time').change(function (e) {
+  updateLineChartWithDelay()
 })
-$('#pointsNumber').change(function (e) {
-  updatePlot()
+$('#points-number').change(function (e) {
+  updateLineChart()
 })
 
 let autoUpdateTimerId = null
-$('#autoUpdateButton').click(function (e) {
+$('#auto-update-button').click(function (e) {
   if (e.target.checked) {
     autoUpdateTimerId = setTimeout(function run () {
-      updatePlot()
+      updateLineChart()
       autoUpdateTimerId = setTimeout(run, 1000)
     }, 1000)
   } else {
@@ -117,18 +101,24 @@ $('#autoUpdateButton').click(function (e) {
   }
 })
 
-function updatePlotWithDelay () {
+function updateLineChartWithDelay () {
   clearTimeout(delayedUpdateTimerId)
   delayedUpdateTimerId = setTimeout(function () {
-    updatePlot()
+    updateLineChart()
   }, 500)
 }
 
-function updatePlot () {
-  const startDate = document.getElementById('startDate').value
-  const startTime = document.getElementById('startTime').value
-  const endTime = document.getElementById('endTime').value
-  const pointsNumber = document.getElementById('pointsNumber').value
+function clearLineChartDatasets () {
+  for (let i = 0; i < lineChartDatasets.length; i++) {
+    lineChartDatasets[i].data = []
+  }
+}
+
+function updateLineChart () {
+  const startDate = document.getElementById('start-date').value
+  const startTime = document.getElementById('start-time').value
+  const endTime = document.getElementById('end-time').value
+  const pointsNumber = document.getElementById('points-number').value
 
   $.ajax({
     url: apiUrl,
@@ -142,10 +132,12 @@ function updatePlot () {
       pointsNumber: pointsNumber,
     },
     success: function (response) {
-      clearDatasets()
+      clearLineChartDatasets()
       if (1) {
-        config.options.scales.x.min = Date.parse(startDate + 'T' + startTime)
-        config.options.scales.x.max = Date.parse(startDate + 'T' + endTime)
+        lineChartConfig.options.scales.x.min = Date.parse(
+          startDate + 'T' + startTime)
+        lineChartConfig.options.scales.x.max = Date.parse(
+          startDate + 'T' + endTime)
       }
 
       let lastLimitId = null
@@ -153,7 +145,7 @@ function updatePlot () {
         const newData = response[i]
         if (newData.y == null) {
           try {
-            datasets[lastLimitId].data.push(newData)
+            lineChartDatasets[lastLimitId].data.push(newData)
           } catch (error) {}
           continue
         }
@@ -172,20 +164,21 @@ function updatePlot () {
         if (newLimitId !== lastLimitId) {
           const lastData = response[i - 1]
           try {
-            datasets[lastLimitId].data.push({ x: lastData.x, y: null })
-            datasets[newLimitId].data.push({ x: lastData.x, y: lastData.y })
+            lineChartDatasets[lastLimitId].data.push({ x: lastData.x, y: null })
+            lineChartDatasets[newLimitId].data.push(
+              { x: lastData.x, y: lastData.y })
           } catch (error) {}
 
           lastLimitId = newLimitId
         }
-        datasets[newLimitId].data.push(newData)
+        lineChartDatasets[newLimitId].data.push(newData)
       }
-      myChart.update()
+      lineChart.update()
     },
     error: function (response) {
       console.log('ajax error')
-      clearDatasets()
-      myChart.update()
+      clearLineChartDatasets()
+      lineChart.update()
     },
   })
 }

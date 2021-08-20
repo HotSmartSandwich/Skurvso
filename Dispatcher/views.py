@@ -15,10 +15,10 @@ def get_context(building_id=None, node_id=None, unit_id=None):
     context = dict()
     if unit_id is not None:
         context = {
-            'startDate': date.today().isoformat(),
-            'startTime': time(7, 30).isoformat(),
-            'endTime': time(17, 30).isoformat(),
-            'pointsNumber': 250
+            'start_date': date.today().isoformat(),
+            'start_time': time(7, 30).isoformat(),
+            'end_time': time(17, 30).isoformat(),
+            'points_number': 250
         }
 
         unit = Unit.objects.get(id=unit_id)
@@ -62,13 +62,10 @@ class MeasurementsList(views.APIView):
         request_params = request.query_params
 
         unit_id = request_params.get('unitId')
-        try:
-            start_date = date.fromisoformat(request_params.get('startDate'))
-            start_time = time.fromisoformat(request_params.get('startTime'))
-            end_time = time.fromisoformat(request_params.get('endTime'))
-            points_number = abs(int(request_params.get('pointsNumber')))
-        except ValueError:
-            return Response()
+        start_date = date.fromisoformat(request_params.get('startDate'))
+        start_time = time.fromisoformat(request_params.get('startTime') or '00:00')
+        end_time = time.fromisoformat(request_params.get('endTime') or '23:59:59')
+        points_number = abs(int(request_params.get('pointsNumber') or 0))
 
         start_datetime = TZ.localize(datetime.combine(start_date, start_time))
         end_datetime = TZ.localize(datetime.combine(start_date, end_time))
@@ -77,15 +74,19 @@ class MeasurementsList(views.APIView):
         query = Measurement.objects.filter(**query_filter, value__isnull=False).order_by('time')
 
         try:
-            step = round(query.count() / points_number) or 1
-        except ZeroDivisionError:
-            return Response()
-        try:
             latest_measurement = query.latest()
         except Measurement.DoesNotExist:
             return Response()
 
-        query_sliced: list[Measurement] = query[::step]
+        try:
+            step = round(query.count() / points_number)
+        except ZeroDivisionError:
+            step = 0
+        if step > 1:
+            query_sliced: list[Measurement] = query[::step]
+        else:
+            query_sliced: list[Measurement] = list(query)
+
         query_sliced.append(latest_measurement)
 
         break_points: list[Measurement] = list(Measurement.objects.filter(**query_filter, value__isnull=True))

@@ -9,38 +9,111 @@
 {% block content %}
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">{{ unit.name }}</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="form-floating">
-                <input type="date" class="form-control" id="startDate" value="{{ startDate }}">
-                <label for="startDate" class="form-label">Дата измерений</label>
+        <div class="row">
+            <div class="col">
+                <div class="btn-group">
+                    <input type="radio" class="btn-check" name="output-type" id="output-type-line">
+                    <label class="btn btn-outline-primary" for="output-type-line">График</label>
+                    <input type="radio" class="btn-check" name="output-type" id="output-type-table">
+                    <label class="btn btn-outline-primary" for="output-type-table">Таблица</label>
+                    <input type="radio" class="btn-check" name="output-type" id="output-type-pie">
+                    <label class="btn btn-outline-primary" for="output-type-pie">Диаграмма</label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="date" class="form-control" id="start-date" value="{{ start_date }}">
+                    <label for="start-date" class="form-label">Дата измерений</label>
+                </div>
             </div>
         </div>
     </div>
 
-    <canvas class="my-4 w-100" id="chart" width="900" height="380"></canvas>
 
-    {# Сделать выпадающее меню с параметрами отображения #}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="form-floating">
-                    <input type="time" class="form-control" id="startTime" value="{{ startTime }}">
-                    <label for="startTime">Время начала</label>
-                </div>
-                <div class="form-floating">
-                    <input type="time" class="form-control" id="endTime" value="{{ endTime }}">
-                    <label for="endTime">Время окончания</label>
+    <div id="output-line">
+        <div class="accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#accordion-line-params">
+                        Параметры графика
+                    </button>
+                </h2>
+                <div id="accordion-line-params" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="time" class="form-control" id="start-time"
+                                               value="{{ start_time }}">
+                                        <label for="start-time">Время начала</label>
+                                    </div>
+                                    <div class="form-floating">
+                                        <input type="time" class="form-control" id="end-time" value="{{ end_time }}">
+                                        <label for="end-time">Время окончания</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="points-number"
+                                               value="{{ points_number }}">
+                                        <label for="points-number" class="form-label">Количество точек</label>
+                                    </div>
+                                    <div class="btn-group" style="width: 100%">
+                                        <input type="checkbox" class="btn-check" id="auto-update-button">
+                                        <label class="btn btn-outline-success"
+                                               for="auto-update-button">Автообновление</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="form-floating">
-                    <input type="number" class="form-control" id="pointsNumber" value="{{ pointsNumber }}">
-                    <label for="pointsNumber" class="form-label">Количество точек</label>
+        </div>
+        <canvas class="my-4 w-100" id="line-chart" width="900" height="380"></canvas>
+    </div>
+
+    <div id="output-table">
+        <div class="accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#accordion-table-params">
+                        Параметры таблицы
+                    </button>
+                </h2>
+                <div id="accordion-table-params" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+
+                    </div>
                 </div>
-                <div class="btn-group" style="width: 100%">
-                    <input type="checkbox" class="btn-check" id="autoUpdateButton">
-                    <label class="btn btn-outline-success" for="autoUpdateButton">Автообновление</label>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="output-pie">
+        <div class="accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#accordion-pie-params">
+                        Параметры диграммы
+                    </button>
+                </h2>
+                <div id="accordion-pie-params" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                    </div>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <canvas class="my-4 w-100" id="pie-chart" width="900" height="380"></canvas>
+            </div>
+            <div class="col">
             </div>
         </div>
     </div>
@@ -50,8 +123,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.js"></script>
 
     <script>
+      const unitId = '{{ unit.id }}'
       const apiUrl = '/api/measurement/'
-      const unitId = {{ unit.id }};
     </script>
-    <script src="/static/line_plot_handler.js"></script>
+    <script src="/static/charts_setup.js"></script>
+    <script src="/static/line_chart_handler.js"></script>
+    <script src="/static/pie_chart_handler.js"></script>
+    <script src="/static/output_manager.js"></script>
 {% endblock content %}
