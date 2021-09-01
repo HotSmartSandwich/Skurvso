@@ -2,7 +2,6 @@ import os
 
 from celery import Celery
 
-# celery -A Skurvso beat --loglevel=INFO
 # celery -A Skurvso worker --loglevel=WARNING --pool=gevent --concurrency=100
 
 

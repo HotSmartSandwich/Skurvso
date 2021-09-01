@@ -2,9 +2,9 @@ import time
 
 from celery.signals import worker_ready
 
-from Dispatcher.models import Node
-from Dispatcher.node_communicator import NodeCommunicator, CommunicatorException
 from Skurvso.celery import app
+from .models import Node
+from .node_communicator import NodeCommunicator, CommunicatorException
 
 
 @worker_ready.connect
@@ -27,6 +27,8 @@ def handle_node(node_id, time_interval=1):
             print_exception(node, e)
             time.sleep(10)
             continue
+
+        node_communicator.update_unit_list()
 
         while True:
             time.sleep(time_interval - time.time() % time_interval + 0.2)

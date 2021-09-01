@@ -47,6 +47,7 @@ class Unit(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField('Название оборудования', max_length=150)
     host = models.GenericIPAddressField('IP-адрес', protocol='IPv4', null=True, blank=True)
+    port = models.IntegerField('Порт', default=48620, null=True, blank=True)
     node = models.ForeignKey(Node, verbose_name='Узел', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):

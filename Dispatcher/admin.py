@@ -39,7 +39,7 @@ class NodeAdmin(admin.ModelAdmin):
 
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
-    list_display = ('node', 'name')
+    list_display = ('id', 'node', 'name')
     list_display_links = ('name',)
     list_filter = ('node',)
 
