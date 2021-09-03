@@ -26,6 +26,7 @@ class Node(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField('Название узла', max_length=150)
     host = models.GenericIPAddressField('IP-адрес', protocol='IPv4', unique=True)
+    port = models.IntegerField('Порт', default=48620, null=True, blank=True)
     image = models.ImageField('Фото', upload_to='nodes_photo', null=True, blank=True)
     building = models.ForeignKey(Building, verbose_name='Здание', on_delete=models.SET_NULL, null=True, blank=True)
 

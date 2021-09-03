@@ -22,7 +22,7 @@ class NodeCommunicator:
 
     def __init__(self, node: Node):
         self._node_id = node.id
-        base_url = f'http://{node.host}:{48620}/skurvso/api'
+        base_url = f'http://{node.host}:{node.port}/skurvso/api'
         self._ntp_server_url = node.host
         self._units_url = base_url + '/units'
         self._time_key_url = base_url + '/time_key'
@@ -36,25 +36,22 @@ class NodeCommunicator:
             raise CommunicatorException('connect: time_key validation error')
 
     def update_unit_list(self) -> None:
-        node_units: list[dict] = self._send_get_request(self._units_url)
+        node_units: list[dict] = self.request('get', self._units_url)
         node_units: dict[int, dict] = {unit.get('id'): unit for unit in node_units}
 
         reboot_required = False
         for unit in Unit.objects.filter(node_id=self._node_id):
-            # TODO: UnitModelSerializer
             if unit.id in node_units:
                 if unit.host == node_units.get(unit.id).get('host'):
                     node_units.pop(unit.id)
                 else:
-                    print('post', unit)
                     self._post_unit(unit)
                     reboot_required = True
             else:
-                print('put', unit)
                 self._put_unit(unit)
                 reboot_required = True
+
         for unit in node_units:
-            print('delete', unit)
             self._delete_unit(unit)
             reboot_required = True
 
@@ -62,7 +59,7 @@ class NodeCommunicator:
             self.reboot_node()
 
     def _get_time_key(self) -> str:
-        response: dict = self._send_get_request(self._time_key_url)
+        response: dict = self.request('get', self._time_key_url)
         return response.get('time_key')
 
     def _get_time_delta(self) -> float:
@@ -81,7 +78,7 @@ class NodeCommunicator:
         pass
 
     def _handle_records(self, records_url, db_model) -> None:
-        records: list = self._send_get_request(records_url, params={'time_key': self._node_time_key}, timeout=10)
+        records: list = self.request('get', records_url, params={'time_key': self._node_time_key}, timeout=10)
 
         if not records:
             return
@@ -113,9 +110,9 @@ class NodeCommunicator:
                                              'end_id': end_id})
 
     @staticmethod
-    def _send_get_request(url: str, params=None, timeout: int = 5):
+    def request(request_type: str, url: str, params: dict = None, data: dict = None, timeout: int = 5):
         try:
-            response = requests.get(url, params=params, timeout=timeout)
+            response = requests.request(request_type, url, params=params, json=data, timeout=timeout)
         except (ConnectionRefusedError, ConnectionError, ConnectTimeout) as e:
             raise CommunicatorException(f'{url}: {e}')
         try:
@@ -124,26 +121,17 @@ class NodeCommunicator:
             raise CommunicatorException(f'{url}: JSON decode error')
 
     def _post_unit(self, unit):
-        try:
-            response = requests.post(self._units_url, unit, timeout=5)
-        except (ConnectionRefusedError, ConnectionError, ConnectTimeout) as e:
-            raise CommunicatorException(f'{self._units_url}: {e}')
-        if unit != response:
+        response = self.request('post', self._units_url, unit, timeout=5)
+        if response != unit:
             pass
 
     def _put_unit(self, unit):
-        try:
-            response = requests.put(self._units_url, unit, timeout=5)
-        except (ConnectionRefusedError, ConnectionError, ConnectTimeout) as e:
-            raise CommunicatorException(f'{self._units_url}: {e}')
+        response = self.request('put', self._units_url, unit, timeout=5)
         if unit != response:
             pass
 
     def _delete_unit(self, unit):
-        try:
-            response = requests.delete(self._units_url, unit, timeout=5)
-        except (ConnectionRefusedError, ConnectionError, ConnectTimeout) as e:
-            raise CommunicatorException(f'{self._units_url}: {e}')
+        response = self.request('delete', self._units_url, unit, timeout=5)
         if unit != response:
             pass
 
